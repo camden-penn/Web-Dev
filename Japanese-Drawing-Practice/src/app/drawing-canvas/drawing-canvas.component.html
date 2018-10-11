@@ -1,0 +1,51 @@
+<div [hidden]="done">
+    <div class="question">
+        Draw the following in Japanese: {{curr_question?.question}}
+    </div>
+    <canvas #drawing_canvas class="drawing-canvas" (mousedown)="begin_line($event)" (mousemove)="continue_line($event)" (mouseup)="line_done()" (mouseout)="line_done()"></canvas>
+    <br/>
+    <button mat-raised-button style="margin-right:30px;" (click)="draw_mode()">
+            Pencil
+    </button>
+    <button mat-raised-button  style="margin-right:30px;" (click)="eraser_mode()">
+        Eraser
+    </button>
+    <button mat-raised-button  (click)="clear_screen(true)">
+        Clear All
+    </button>
+    <br/><br/>
+    <button mat-raised-button [disabled]="curr_q_index==0"  style="margin-right:30px;" (click)="previous_question()">
+        Previous Question
+    </button>
+    <button mat-raised-button style="margin-right:30px;" (click)="next_question()">
+        Next Question
+    </button>
+    <button mat-raised-button  style="margin-right:30px;" (click)="show_hint()">
+        Hint
+    </button>
+    <button mat-raised-button (click)="check_answer()">
+        Check Answer
+    </button>
+    <br/><br/>
+    <div class="hint" *ngIf="hint_enabled && curr_question!=null">
+        Hint: {{curr_question?.hint}}
+    </div>
+    <div class="results" *ngIf="correct!=null">
+        Seen Text: {{result}}
+        <br/>
+        <div *ngIf="correct == true">
+            That's correct!
+        </div>
+        <div *ngIf="correct == false">
+            That's incorrect!
+        </div>
+    </div>
+</div>
+<ng-container *ngIf="done">
+    <div>
+        Done!
+        <button mat-raised-button (click)="restart()">
+            Back to start
+        </button>
+    </div>
+</ng-container>
