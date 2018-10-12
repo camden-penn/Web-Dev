@@ -1,14 +1,26 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
-import { MatButtonModule, MatIconModule } from '@angular/material';
+import { Component, OnInit, ViewChild, ElementRef, HostListener, NgModule } from '@angular/core';
+import { MatButtonModule, MatProgressBarModule } from '@angular/material';
 import * as Tesseract from 'tesseract.js';
-import { ThrowStmt } from '@angular/compiler';
+import { BrowserModule } from '@angular/platform-browser';
+
 @Component({
   selector: 'drawing-canvas',
   templateUrl: './drawing-canvas.component.html',
   styleUrls: ['./drawing-canvas.component.css']
 })
+@NgModule({
+  imports:[
+    BrowserModule,
+    MatButtonModule,
+    MatProgressBarModule,
+  ],
+})
 export class DrawingCanvasComponent implements OnInit {
+  
   randomize:boolean=false;
+  checking_answer:boolean=false;
+  check_answer_progress:number=0;
+  checking_task:string="";
   done:boolean = false;
 
   debugMode:boolean = false;
@@ -32,7 +44,7 @@ export class DrawingCanvasComponent implements OnInit {
   tesseract_settings=
   {
     lang: 'jpn',
-    textord_min_xheight: 10,
+    textord_min_xheight: 5,
   };
 
   result:string='';
@@ -44,8 +56,8 @@ export class DrawingCanvasComponent implements OnInit {
     new question('college',['大学','だいがく'],'daigaku'),
     new question('ice cream',['アイスクリーム'],'Use katakana'),
     new question('one',['一','いち'],'ichi'),
-    new question('two',['ニ','に'],'ni'),
-    new question('three',['三','さん'],'san'),
+    new question('two o\' clock',['ニ時','にじ'],'niji'),
+    new question('three o\'clock',['三時','さんじ'],'sanji'),
     new question('four',['四','よん','し'],'yon'),
     new question('five',['五','ご'],'go'),
     new question('six',['六','ろく'],'roku'),
@@ -77,7 +89,7 @@ export class DrawingCanvasComponent implements OnInit {
     
   }
   shuffle(){
-    //Shuffle the values in question_order.
+    //TODO: Shuffle the values in question_order.
 
   }
   ngAfterViewInit():void{
@@ -213,16 +225,22 @@ export class DrawingCanvasComponent implements OnInit {
         .then(data => console.log(data))
         .finally(data => console.log(data))
     }else{
+      this.checking_answer=true;
       this.myTesseract.recognize(this.context, 
         this.tesseract_settings
       )
-      .progress(packet => console.info(packet))
+      .progress(packet => this.update_progress_bar(packet))
       .then(data => this.apply_result(data.text))
     }
+  }
+  update_progress_bar(packet){
+    this.checking_task = packet.task;
+    this.check_answer_progress = packet.progress;
   }
   apply_result(text:string){
     this.result=this.clear_whitespace_from(text);
     this.correct = this.curr_question.check_answer(this.result);
+    this.checking_answer=false;
   }
   clear_whitespace_from(text:string):string{
     return text.replace(/\s/,'').trim();

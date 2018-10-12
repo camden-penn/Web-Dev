@@ -23,9 +23,19 @@
     <button mat-raised-button  style="margin-right:30px;" (click)="show_hint()">
         Hint
     </button>
-    <button mat-raised-button (click)="check_answer()">
+    <button mat-raised-button [disabled]="checking_answer" (click)="check_answer()">
         Check Answer
     </button>
+    <div name="check_answer_progress" *ngIf="checking_answer">
+        {{checking_task}}
+        <!--
+        <mat-progress-bar
+            class="example-margin"
+            mode="determinate"
+            [value]="check_answer_progress">
+        </mat-progress-bar>
+    -->
+    </div>
     <br/><br/>
     <div class="hint" *ngIf="hint_enabled && curr_question!=null">
         Hint: {{curr_question?.hint}}
