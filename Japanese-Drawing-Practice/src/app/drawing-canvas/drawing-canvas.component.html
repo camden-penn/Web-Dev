@@ -2,7 +2,7 @@
     <div class="question">
         Draw the following in Japanese: {{curr_question?.question}}
     </div>
-    <canvas #drawing_canvas class="drawing-canvas" (mousedown)="begin_line($event)" (mousemove)="continue_line($event)" (mouseup)="line_done()" (mouseout)="line_done()"></canvas>
+    <canvas #drawing_canvas class="drawing-canvas" (touchstart)="begin_line($event)" (touchmove)="continue_line($event)" (touchend)="line_done()" (mousedown)="begin_line($event)" (mousemove)="continue_line($event)" (mouseup)="line_done()" (mouseout)="line_done()"></canvas>
     <br/>
     <button mat-raised-button [color]="tool_button_color('Pencil')" style="margin-right:30px;" (click)="pencil_mode()">
             Pencil

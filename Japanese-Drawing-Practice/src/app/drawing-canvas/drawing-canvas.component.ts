@@ -120,6 +120,7 @@ export class DrawingCanvasComponent implements OnInit {
     this.add_location(e.pageX - this.offset_left,e.pageY-this.offset_top,false);
   }
   continue_line(e:MouseEvent):void{
+    e.preventDefault();
     if(this.paint){
       this.add_location(e.pageX - this.offset_left,e.pageY-this.offset_top,true);
     }
