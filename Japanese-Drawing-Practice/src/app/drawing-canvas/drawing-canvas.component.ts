@@ -21,8 +21,12 @@ export class DrawingCanvasComponent implements OnInit {
   context:CanvasRenderingContext2D;
   offset_left:number=0;
   offset_top:number=0;
+
+  //Still can't get this to behave properly.
+  /*
   canvas_width: 800;
   canvas_height: 400;
+  */
   @HostListener('window:resize')on_resize(){
     this.offset_left = this.canvas_elem.nativeElement.offsetLeft;
     this.offset_top = this.canvas_elem.nativeElement.offsetTop;
@@ -63,13 +67,24 @@ export class DrawingCanvasComponent implements OnInit {
     new question('yen',['円','えん'],'en'),
   ]; //List of questions [TODO: init from file?]
   question_order:number[]; //randomize this to shuffle questions
-  curr_q_index=0; //Index within question order currently being asked
+  curr_q_index:number=0; //Index within question order currently being asked
   curr_question:question; //Reference to the current question
   hint_enabled:boolean = false;
   constructor() { }
 
-  ngOnInit() {
-    //Fill question_order with 1..number of questions.
+  ngOnInit():void {
+    //Import URL arguments.
+    let URL_divided=document.URL.split('?');
+    if(URL_divided.length>1){
+      let URL_args:string[] = URL_divided[1].split('&');
+      for(let i=0;i<URL_args.length;i++){
+        if (URL_args[i]=='randomize'){
+          this.randomize=true;
+        }
+      }
+    } 
+
+    //Fill question_order with 1..[number of questions].
     this.question_order=[];
     for(let i=0;i<this.questions.length;i++){
       this.question_order.push(i);
@@ -78,10 +93,9 @@ export class DrawingCanvasComponent implements OnInit {
     if(this.randomize){
       this.shuffle();
     }
-    
   }
-  shuffle(){
-    //TODO: Shuffle the values in question_order.
+  shuffle():void{
+    //Shuffles the values in question_order.
     let j:number, x:number, i:number;
     for (i = this.question_order.length - 1; i > 0; i--) {
         j = Math.floor(Math.random() * (i + 1));
@@ -120,7 +134,6 @@ export class DrawingCanvasComponent implements OnInit {
     this.add_location(e.pageX - this.offset_left,e.pageY-this.offset_top,false);
   }
   continue_line(e:MouseEvent):void{
-    e.preventDefault();
     if(this.paint){
       this.add_location(e.pageX - this.offset_left,e.pageY-this.offset_top,true);
     }
@@ -171,10 +184,10 @@ export class DrawingCanvasComponent implements OnInit {
       this.context.stroke();
     }
   }
-  pencil_mode(){
+  pencil_mode():void{
     this.tool_in_use = tools.Pencil;
   }
-  eraser_mode(){
+  eraser_mode():void{
     this.tool_in_use = tools.Eraser;
   }
   tool_button_color(tool_type:string):string{
@@ -185,7 +198,7 @@ export class DrawingCanvasComponent implements OnInit {
       return '';
     }
   }
-  clear_screen(delete_points:boolean=false){
+  clear_screen(delete_points:boolean=false):void{
     this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height); // Clears the canvas
     this.context.fillStyle = "#FFFFFF";
     this.context.fillRect(0,0,this.context.canvas.width, this.context.canvas.height);
@@ -194,13 +207,13 @@ export class DrawingCanvasComponent implements OnInit {
       this.tool_in_use=tools.Pencil;
     }
   }
-  previous_question(){
+  previous_question():void{
     if(this.curr_q_index>0){
       this.curr_q_index--;
       this.update_question();
     }
   }
-  next_question(){
+  next_question():void{
     if(this.curr_q_index<this.questions.length-1){
       this.curr_q_index++;
       this.update_question();
@@ -208,7 +221,7 @@ export class DrawingCanvasComponent implements OnInit {
       this.done = true;
     }
   }
-  update_question(){
+  update_question():void{
     this.curr_question = this.questions[this.question_order[this.curr_q_index]]; 
     this.hint_enabled = false;
     this.points=[];
@@ -216,7 +229,7 @@ export class DrawingCanvasComponent implements OnInit {
     this.correct=null;
     this.clear_screen(true);
   }
-  toggle_show_hint(){
+  toggle_show_hint():void{
     this.hint_enabled=!this.hint_enabled;
   }
   get_hint_button_color():string{
@@ -226,7 +239,7 @@ export class DrawingCanvasComponent implements OnInit {
       return '';
     }
   }
-  check_answer(init:boolean=false){
+  check_answer(init:boolean=false):void{
     if(this.debugMode){
       console.log('Checking.')
     }
@@ -247,11 +260,11 @@ export class DrawingCanvasComponent implements OnInit {
       .then(data => this.apply_result(data.text))
     }
   }
-  update_progress_bar(packet){
+  update_progress_bar(packet):void{
     this.checking_task = packet.status;
-    this.check_answer_progress = packet.progress;
+    this.check_answer_progress = packet.progress*100;
   }
-  apply_result(text:string){
+  apply_result(text:string):void{
     this.result=this.clear_whitespace_from(text);
     this.correct = this.curr_question.check_answer(this.result);
     this.checking_answer=false;
@@ -259,7 +272,7 @@ export class DrawingCanvasComponent implements OnInit {
   clear_whitespace_from(text:string):string{
     return text.replace(/\s/,'').trim();
   }
-  restart(){
+  restart():void{
     if(this.randomize){
       this.shuffle();
     }
