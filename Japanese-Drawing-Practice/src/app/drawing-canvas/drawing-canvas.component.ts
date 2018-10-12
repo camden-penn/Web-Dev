@@ -1,20 +1,12 @@
 import { Component, OnInit, ViewChild, ElementRef, HostListener, NgModule } from '@angular/core';
-import { MatButtonModule, MatProgressBarModule } from '@angular/material';
 import * as Tesseract from 'tesseract.js';
-import { BrowserModule } from '@angular/platform-browser';
 
 @Component({
   selector: 'drawing-canvas',
   templateUrl: './drawing-canvas.component.html',
   styleUrls: ['./drawing-canvas.component.css']
 })
-@NgModule({
-  imports:[
-    BrowserModule,
-    MatButtonModule,
-    MatProgressBarModule,
-  ],
-})
+
 export class DrawingCanvasComponent implements OnInit {
   
   randomize:boolean=false;
@@ -90,7 +82,13 @@ export class DrawingCanvasComponent implements OnInit {
   }
   shuffle(){
     //TODO: Shuffle the values in question_order.
-
+    let j:number, x:number, i:number;
+    for (i = this.question_order.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = this.question_order[i];
+        this.question_order[i] = this.question_order[j];
+        this.question_order[j] = x;
+    }
   }
   ngAfterViewInit():void{
     
@@ -172,11 +170,19 @@ export class DrawingCanvasComponent implements OnInit {
       this.context.stroke();
     }
   }
-  draw_mode(){
+  pencil_mode(){
     this.tool_in_use = tools.Pencil;
   }
   eraser_mode(){
     this.tool_in_use = tools.Eraser;
+  }
+  tool_button_color(tool_type:string):string{
+    let tool=tools[tool_type];
+    if(tool == this.tool_in_use){
+      return 'primary';
+    }else{
+      return '';
+    }
   }
   clear_screen(delete_points:boolean=false){
     this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height); // Clears the canvas
@@ -209,8 +215,15 @@ export class DrawingCanvasComponent implements OnInit {
     this.correct=null;
     this.clear_screen(true);
   }
-  show_hint(){
-    this.hint_enabled=true;
+  toggle_show_hint(){
+    this.hint_enabled=!this.hint_enabled;
+  }
+  get_hint_button_color():string{
+    if(this.hint_enabled){
+      return 'primary';
+    }else{
+      return '';
+    }
   }
   check_answer(init:boolean=false){
     if(this.debugMode){
@@ -234,7 +247,7 @@ export class DrawingCanvasComponent implements OnInit {
     }
   }
   update_progress_bar(packet){
-    this.checking_task = packet.task;
+    this.checking_task = packet.status;
     this.check_answer_progress = packet.progress;
   }
   apply_result(text:string){
