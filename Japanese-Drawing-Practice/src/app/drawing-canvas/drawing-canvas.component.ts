@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, HostListener, NgModule } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, HostListener } from '@angular/core';
 import * as Tesseract from 'tesseract.js';
 
 @Component({
@@ -22,11 +22,6 @@ export class DrawingCanvasComponent implements OnInit {
   offset_left:number=0;
   offset_top:number=0;
 
-  //Still can't get this to behave properly.
-  /*
-  canvas_width: 800;
-  canvas_height: 400;
-  */
   @HostListener('window:resize')on_resize(){
     this.offset_left = this.canvas_elem.nativeElement.offsetLeft;
     this.offset_top = this.canvas_elem.nativeElement.offsetTop;
@@ -37,10 +32,14 @@ export class DrawingCanvasComponent implements OnInit {
   points:point[]=[]; //The points to draw during a redraw.
   
   myTesseract:Tesseract.TesseractStatic;
+  all_hiragana_chars:string='あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだじづでどばびぶべぼぱぴぷぺぽゃゅょっ';
+  all_katakana_chars:string='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフへホマミムメモヤユヨラリルレロワヲンがギグゲゴザジズゼゾダヂヅデドバビブベボパピプぺポャュョッー';
+  expected_kanji:string='零一ニ三四五六七八九十百千万円時分何大学年生日本語私土曜半英毎今月食行';
   tesseract_settings=
   {
     lang: 'jpn',
     textord_min_xheight: 5,
+    tessedit_char_whitelist: /*this.all_hiragana_chars+*/this.all_katakana_chars/*+this.expected_kanji*/,
   };
 
   result:string='';
