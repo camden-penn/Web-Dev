@@ -1,61 +1,16 @@
-<div [hidden]="done">
-    <div class="question">
-        Draw the following in Japanese: <strong>{{curr_question?.question}}</strong>
-    </div>
+
+    <canvas #drawing_canvas class="drawing-canvas" [width]=canvas_width [height]=canvas_height [style]="'width:'+canvas_width+';height:'+canvas_height+';'" (touchstart)="begin_line($event)" (touchmove)="continue_line($event)" (touchend)="line_done()" (mousedown)="begin_line($event)" (mousemove)="continue_line($event)" (mouseup)="line_done()" (mouseout)="line_done()"></canvas>
     <br/>
-    <canvas #drawing_canvas class="drawing-canvas" width=500 height=200 style="width:500;height:200;" (touchstart)="begin_line($event)" (touchmove)="continue_line($event)" (touchend)="line_done()" (mousedown)="begin_line($event)" (mousemove)="continue_line($event)" (mouseup)="line_done()" (mouseout)="line_done()"></canvas>
-    <br/>
-    <button mat-raised-button [color]="tool_button_color('Pencil')" style="margin-right:30px;" (click)="pencil_mode()">
-            Pencil
+    <button mat-raised-button [color]="tool_button_color('Pencil')" style="margin-right:30px;" (click)="select_tool('Pencil')">
+        Pencil
     </button>
-    <button mat-raised-button [color]="tool_button_color('Eraser')" style="margin-right:30px;" (click)="eraser_mode()">
+    <button mat-raised-button [color]="tool_button_color('Brush')" style="margin-right:30px;" (click)="select_tool('Brush')">
+        Brush
+    </button>
+    <button mat-raised-button [color]="tool_button_color('Eraser')" style="margin-right:30px;" (click)="select_tool('Eraser')">
         Eraser
     </button>
     <button mat-raised-button  (click)="clear_screen(true)">
         Clear All
     </button>
-    <br/><br/>
-    <button mat-raised-button [disabled]="curr_q_index==0 || checking_answer"  style="margin-right:30px;" (click)="previous_question()">
-        Previous Question
-    </button>
-    <button mat-raised-button [disabled]="checking_answer" style="margin-right:30px;" (click)="next_question()">
-        Next Question
-    </button>
-    <button mat-raised-button [color]="get_hint_button_color()" style="margin-right:30px;" (click)="toggle_show_hint()">
-        Hint
-    </button>
-    <button mat-raised-button [disabled]="checking_answer" (click)="check_answer()">
-        Check Answer
-    </button>
-    <br/>
-    <div id="check_answer_progress" *ngIf="checking_answer">
-        {{checking_task}}
-        <mat-progress-bar
-            class="example-margin"
-            mode="determinate"
-            [value]="check_answer_progress">
-        </mat-progress-bar>
-    </div>
-    <br/>
-    <div class="hint" *ngIf="hint_enabled && curr_question!=null">
-        Hint: {{curr_question?.hint}}
-    </div>
-    <div class="results" *ngIf="correct!=null && !checking_answer">
-        Seen Text: {{result}}
-        <br/>
-        <div *ngIf="correct == true">
-            That's correct!
-        </div>
-        <div *ngIf="correct == false">
-            That's incorrect!
-        </div>
-    </div>
-</div>
-<ng-container *ngIf="done">
-    <div>
-        Done!
-        <button mat-raised-button (click)="restart()">
-            Back to start
-        </button>
-    </div>
-</ng-container>
+    

@@ -3,5 +3,55 @@
   <h1>
     Welcome to {{ title }}!
   </h1>
-  <drawing-canvas></drawing-canvas>
+  <div [hidden]="done">
+    <div class="question">
+        Draw the following in Japanese: <strong>{{curr_question?.question}}</strong>
+    </div>
+    <br/>
+    <drawing-canvas (image_drawn)="update_image($event)" [(clear)]="clear_canvas"></drawing-canvas>
+    <br/><br/>
+    <button mat-raised-button [disabled]="curr_q_index==0 || checking_answer"  style="margin-right:30px;" (click)="previous_question()">
+        Previous Question
+    </button>
+    <button mat-raised-button [disabled]="checking_answer" style="margin-right:30px;" (click)="next_question()">
+        Next Question
+    </button>
+    <button mat-raised-button [color]="get_hint_button_color()" style="margin-right:30px;" (click)="toggle_show_hint()">
+        Hint
+    </button>
+    <button mat-raised-button [disabled]="checking_answer" (click)="check_answer()">
+        Check Answer
+    </button>
+    <br/>
+    <div id="check_answer_progress" *ngIf="checking_answer">
+      {{checking_task}}
+      <mat-progress-bar
+          class="example-margin"
+          mode="determinate"
+          [value]="check_answer_progress">
+      </mat-progress-bar>
+    </div>
+    <br/>
+    <div class="hint" *ngIf="hint_enabled && curr_question!=null">
+        Hint: {{curr_question?.hint}}
+    </div>
+    <div class="results" *ngIf="correct!=null && !checking_answer">
+        Seen Text: {{result}}
+        <br/>
+        <div *ngIf="correct == true">
+            That's correct!
+        </div>
+        <div *ngIf="correct == false">
+            That's incorrect!
+        </div>
+    </div>
+  </div>
+  <ng-container *ngIf="done">
+      <div>
+          Done!
+          <button mat-raised-button (click)="restart()">
+              Back to start
+          </button>
+      </div>
+  </ng-container>
 </div>
