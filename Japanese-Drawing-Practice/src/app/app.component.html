@@ -23,7 +23,7 @@
         Check Answer
     </button>
     <br/>
-    <div id="check_answer_progress" *ngIf="checking_answer">
+    <div id="check_answer_progress" class="progress-bar-display" *ngIf="checking_answer">
       {{checking_task}}
       <mat-progress-bar
           class="example-margin"
@@ -35,8 +35,16 @@
     <div class="hint" *ngIf="hint_enabled && curr_question!=null">
         Hint: {{curr_question?.hint}}
     </div>
-    <div class="results" *ngIf="correct!=null && !checking_answer">
+    <div class="results progress-bar-display" *ngIf="correct!=null && !checking_answer">
         Seen Text: {{result}}
+        <br/>
+        Confidence in seen text:
+        <mat-progress-bar
+          class="example-margin"
+          mode="determinate"
+          [color]="get_accuracy_rating_color()"
+          [value]="confidence">
+        </mat-progress-bar>
         <br/>
         <div *ngIf="correct == true">
             That's correct!

@@ -13,33 +13,41 @@ export class AppComponent implements OnInit {
   image_data:ImageData=new ImageData(1,1);
 
   randomize:boolean=false;
+  katakana:boolean=false;
+  
   checking_answer:boolean=false;
   check_answer_progress:number=0;
   checking_task:string="";
+
   done:boolean = false;
 
-  debugMode:boolean = true;
+  debugMode:boolean = false;
   myTesseract:Tesseract.TesseractStatic;
   readonly all_hiragana_chars:string='あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだじづでどばびぶべぼぱぴぷぺぽゃゅょっ';
-  readonly all_katakana_chars:string='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフへホマミムメモヤユヨラリルレロワヲンがギグゲゴザジズゼゾダヂヅデドバビブベボパピプぺポャュョッー';
-  readonly expected_kanji:string='零一ニ三四五六七八九十百千万円時分何大学年生日本語私土曜半英毎今月食行';
+  readonly all_katakana_chars:string='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフへホマミムメモヤユヨラリルレロワヲンがギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポャュョッー';
+  readonly expected_kanji:string='零一二三四五六七八九十百千万円時分何大学年生日本語私土曜半英毎今明月食行';
   tesseract_settings=
   {
     lang: 'jpn',
-    //The kanji '一' overrides the katakana 'ー'. For katakana practice, it is thus best to not include kanji.
+    //The kanji '一' often overrides the katakana 'ー'. 
+    //For katakana practice, it is thus best to not include kanji.
     tessedit_char_whitelist: this.all_hiragana_chars+this.all_katakana_chars+this.expected_kanji,
   };
   result:string='';
   correct:boolean = null;
+  confidence:number=0;
 
   questions:question[]=
   [
     new question('Japan',['日本','にほん'],'nihon'),
     new question('college',['大学','だいがく'],'daigaku'),
-    new question('ice cream',['アイスクリーム'],'Use katakana'),
     new question('I',['私','わたし'],'watashi'),
+    new question('Saturday',['土曜日','どようび'],'doyoubi'),
+    new question('Sunday',['日曜日','にちようび'],'nichiyoubi'),
+    new question('today',['今日','きょう'],'kyou'),
+    new question('tomorrow',['明日','あした'],'ashita'),
     new question('one',['一','いち'],'ichi'),
-    new question('two o\' clock',['ニ時','にじ'],'niji'),
+    new question('two o\' clock',['二時','にじ'],'niji'),
     new question('three o\'clock',['三時','さんじ'],'sanji'),
     new question('four',['四','よん','し'],'yon'),
     new question('five',['五','ご'],'go'),
@@ -66,9 +74,28 @@ export class AppComponent implements OnInit {
       for(let i=0;i<URL_args.length;i++){
         if (URL_args[i]=='randomize'){
           this.randomize=true;
+        }else if(URL_args[i]=='katakana'){
+          this.katakana=true;
         }
       }
     } 
+    //If katakana is enabled, reset tesseract and question list.
+    if(this.katakana){
+      this.tesseract_settings=
+      {
+        lang: 'jpn',
+        //The kanji '一' often overrides the katakana 'ー'. 
+        //For katakana practice, it is thus best to not include kanji.
+        tessedit_char_whitelist: this.all_katakana_chars,
+      };
+      this.questions=[
+        new question('ice cream',['アイスクリーム'],'aisukuriim'),
+        new question('jeans',['ジーンズ'],'jiinzu'),
+        new question('pen',['ペン'],'It\'s already in romaji'),
+        new question('notebook',['ノート'],'nooto'),
+      ]
+    }
+    
 
     //Fill question_order with 1..[number of questions].
     this.question_order=[];
@@ -161,17 +188,27 @@ export class AppComponent implements OnInit {
         this.tesseract_settings
       )
       .progress(packet => this.update_progress_bar(packet))
-      .then(data => this.apply_result(data.text))
+      .then(data => this.apply_result(data.text,data.confidence))
     }
   }
   update_progress_bar(packet):void{
     this.checking_task = packet.status;
     this.check_answer_progress = packet.progress*100;
   }
-  apply_result(text:string):void{
+  apply_result(text:string,confidence:number):void{
     this.result=this.clear_whitespace_from(text);
     this.correct = this.curr_question.check_answer(this.result);
+    this.confidence=confidence;
     this.checking_answer=false;
+  }
+  get_accuracy_rating_color():string{
+    if(this.confidence < 50){
+      return 'warn';
+    }else if(this.confidence < 75){
+      return 'accent';
+    }else{
+      return 'primary';
+    }
   }
   clear_whitespace_from(text:string):string{
     return text.replace(/\s/g,'').trim();

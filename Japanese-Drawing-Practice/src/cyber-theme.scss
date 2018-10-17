@@ -1,0 +1,11 @@
+@import "~@angular/material/theming";
+
+@include mat-core();
+
+$cyber-primary: mat-palette($mat-indigo);
+$cyber-accent:  mat-palette($mat-green);
+$cyber-warn:    mat-palette($mat-red);
+
+$cyber-theme:   mat-light-theme($cyber-primary,$cyber-accent,$cyber-warn);
+
+@include angular-material-theme($cyber-theme);
