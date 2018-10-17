@@ -24,14 +24,16 @@ export class AppComponent implements OnInit {
   debugMode:boolean = false;
   myTesseract:Tesseract.TesseractStatic;
   readonly all_hiragana_chars:string='あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんがぎぐげござじずぜぞだじづでどばびぶべぼぱぴぷぺぽゃゅょっ';
-  readonly all_katakana_chars:string='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフへホマミムメモヤユヨラリルレロワヲンがギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポャュョッー';
+  readonly all_katakana_chars:string='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンがギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポャュョッー';
   readonly expected_kanji:string='零一二三四五六七八九十百千万円時分何大学年生日本語私土曜半英毎今明月食行';
   tesseract_settings=
   {
     lang: 'jpn',
     //The kanji '一' often overrides the katakana 'ー'. 
     //For katakana practice, it is thus best to not include kanji.
-    tessedit_char_whitelist: this.all_hiragana_chars+this.all_katakana_chars+this.expected_kanji,
+    //Katakana questions are implemented in ngOnInit, contingent on 'katakana' being a URL argument.
+    //The katakana questions replace the default hiragana/kanji mix if enabled.
+    tessedit_char_whitelist: this.all_hiragana_chars+this.expected_kanji,
   };
   result:string='';
   correct:boolean = null;
