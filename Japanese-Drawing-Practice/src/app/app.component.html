@@ -8,7 +8,7 @@
         Draw the following in Japanese: <strong>{{curr_question?.question}}</strong>
     </div>
     <br/>
-    <drawing-canvas (image_drawn)="update_image($event)" [(screen_clear)]="clear_canvas"></drawing-canvas>
+    <app-drawing-canvas (image_drawn)="update_image($event)" [(screen_clear)]="clear_canvas"></app-drawing-canvas>
     <br/><br/>
     <button mat-raised-button [disabled]="curr_q_index==0 || checking_answer"  style="margin-right:30px;" (click)="previous_question()">
         Previous Question

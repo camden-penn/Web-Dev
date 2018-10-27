@@ -17,7 +17,7 @@ import {
 })
 
 export class DrawingCanvasComponent implements OnChanges, AfterViewInit {
-  debug_mode = false;
+  debug_mode = true;
   canvas_ready = false;
   @Input() canvas_width = 500;
   @Input() canvas_height = 200;
@@ -42,8 +42,7 @@ export class DrawingCanvasComponent implements OnChanges, AfterViewInit {
   }
 
   @HostListener('window:resize')on_resize() {
-    this.offset_left = this.canvas_elem.nativeElement.offsetLeft;
-    this.offset_top = this.canvas_elem.nativeElement.offsetTop;
+    this.get_new_canvas_position();
   }
 
   constructor() { }
@@ -51,16 +50,19 @@ export class DrawingCanvasComponent implements OnChanges, AfterViewInit {
   ngAfterViewInit(): void {
     // Initialize canvas
     this.context = this.canvas_elem.nativeElement.getContext('2d');
+    this.canvas_ready = true;
     this.get_new_canvas_position();
     this.clear_screen();
-    this.canvas_ready = true;
   }
 
   get_new_canvas_position() {
     if (this.canvas_ready) {
-      const el: HTMLElement = this.canvas_elem.nativeElement;
-      this.offset_left = el.offsetLeft;
-      this.offset_top = el.offsetTop;
+      const canvas_location: ClientRect = this.canvas_elem.nativeElement.getBoundingClientRect();
+      if (this.debug_mode) {
+        console.log(canvas_location);
+      }
+      this.offset_left = canvas_location.left;
+      this.offset_top = canvas_location.top;
     }
   }
   begin_line(e: MouseEvent): void {
