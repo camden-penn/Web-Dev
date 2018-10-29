@@ -17,7 +17,7 @@ import {
 })
 
 export class DrawingCanvasComponent implements OnChanges, AfterViewInit {
-  debug_mode = true;
+  debug_mode = false;
   canvas_ready = false;
   @Input() canvas_width = 500;
   @Input() canvas_height = 200;
@@ -35,8 +35,14 @@ export class DrawingCanvasComponent implements OnChanges, AfterViewInit {
   points: Point[] = [];              // The points to draw during a redraw.
 
   ngOnChanges() {
+    if (this.debug_mode) {
+      console.log('ngOnChanges.');
+    }
     if (this.screen_clear) {
       this.clear_screen(true);
+      if (this.debug_mode) {
+        console.log('Clearing screen.');
+      }
     }
     this.get_new_canvas_position();
   }
@@ -88,6 +94,7 @@ export class DrawingCanvasComponent implements OnChanges, AfterViewInit {
       console.log('Adding location at (' + x + ', ' + y + ').');
     }
     this.screen_clearChange.emit(false);
+    this.screen_clear = false;
     this.points.push(new Point(x, y, is_dragging, this.tool_in_use));
     this.redraw_canvas();
   }
@@ -156,11 +163,11 @@ export class DrawingCanvasComponent implements OnChanges, AfterViewInit {
       this.context.fillRect(0, 0, this.context.canvas.width, this.context.canvas.height);
       if (delete_points) {
         this.points = [];
+        this.screen_clearChange.emit(true);
         if (this.tool_in_use === tools.Eraser) {
           this.tool_in_use = tools.Pencil;
         }
       }
-      this.screen_clearChange.emit(true);
     }
   }
 }
